@@ -14,7 +14,7 @@ public class CharacterMovementController : MonoBehaviour
     private float _lookPitch = 0f;
     private float _velocityY = 0f;
 
-    public void Move(Vector2 ratios)
+    public void Move(Vector2 axes)
     {
         _velocityY += gravity * Time.deltaTime;
         if (controller.isGrounded)
@@ -22,7 +22,7 @@ public class CharacterMovementController : MonoBehaviour
             _velocityY = 0f;
         }
 
-        var velocity = (controller.transform.forward * ratios.y + controller.transform.right * ratios.x) * moveSpeed + Vector3.down * _velocityY;
+        var velocity = (controller.transform.forward * axes.y + controller.transform.right * axes.x) * moveSpeed + Vector3.down * _velocityY;
         controller.Move(velocity * Time.deltaTime);
     }
 
