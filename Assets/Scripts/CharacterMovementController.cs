@@ -10,25 +10,23 @@ public class CharacterMovementController : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float lookDeltaScaler;
     [SerializeField, Range(0f, 90f)] private float maxVerticalLookRange;
 
+    private float _lookPitch = 0f;
+
     public void Move(Vector2 ratios)
     {
-        float frameSpeed = moveSpeed * Time.deltaTime;
-        var amount = new Vector3(ratios.x * frameSpeed, 0f, ratios.y * frameSpeed);
-        controller.Move(amount);
+        var movement = controller.transform.forward * ratios.y + controller.transform.right * ratios.x;
+        controller.Move(moveSpeed * Time.deltaTime * movement);
     }
 
     public void Look(Vector2 lookDelta)
     {
+        // Yaw
         var horizontalRotation = Vector3.up * lookDelta.x * lookDeltaScaler;
         controller.transform.Rotate(horizontalRotation);
 
-        var verticalRotation = Vector3.right * -lookDelta.y * lookDeltaScaler;
-        fpsCameraContainer.Rotate(verticalRotation);
-
-        // Limit vertical rotation
-        var checkAngles = fpsCameraContainer.localEulerAngles;
-        float xAngle = checkAngles.x > 180f ? checkAngles.x - 360f : checkAngles.x;
-        xAngle = Mathf.Clamp(xAngle, -maxVerticalLookRange, maxVerticalLookRange);
-        fpsCameraContainer.localRotation = Quaternion.Euler(xAngle, checkAngles.y, checkAngles.z);
+        // Pitch
+        _lookPitch -= lookDelta.y * lookDeltaScaler;
+        _lookPitch = Mathf.Clamp(_lookPitch, -maxVerticalLookRange, maxVerticalLookRange);
+        fpsCameraContainer.localEulerAngles = Vector3.right * _lookPitch;
     }
 }
