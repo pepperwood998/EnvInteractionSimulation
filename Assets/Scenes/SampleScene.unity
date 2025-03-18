@@ -1532,6 +1532,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 1313887442}
   moveSpeed: 8
+  gravity: 10
   fpsCameraContainer: {fileID: 1806699961}
   lookDeltaScaler: 0.1
   maxVerticalLookRange: 65
