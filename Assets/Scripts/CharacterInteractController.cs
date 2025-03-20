@@ -1,32 +1,52 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CharacterInteractController : MonoBehaviour
 {
+    [SerializeField] private SerializedDictionary<InteractionType, UnityEvent<IInteractable>> interactionDelegateMap;
+    [Space]
+    [SerializeField] private InteractGroupConfig interactGroupConfig;
     [SerializeField] private Transform hand;
 
     private IInteractable _focusing;
     private IPickable _holding;
+    private bool _forceCheckHighlight;
 
     public void Focus(IInteractable interactable)
     {
-        if (_focusing != null)
+        if (interactable != _focusing)
         {
-            if (_focusing != interactable && _focusing is IHighlightable highlightable)
+            if (_focusing != null)
             {
-                highlightable.HideHighlight();
+                if (_focusing.Context.TryGetComponent<HighlightHelper>(out var highlight))
+                {
+                    highlight.HideHighlight();
+                }
             }
         }
 
-        if (interactable != _focusing)
+        if (interactable != _focusing || _forceCheckHighlight)
         {
-            if (interactable is IHighlightable highlightable)
+            _forceCheckHighlight = false;
+
+            if (interactable.Context.TryGetComponent<HighlightHelper>(out var current))
             {
-                highlightable.ShowHighlight();
+                var interactionType = interactGroupConfig.GetInteractionType(_holding, interactable);
+                if (interactionType != InteractionType.None)
+                {
+                    current.ShowHighlight();
+                }
+                else
+                {
+                    current.HideHighlight();
+                }
             }
         }
+
         _focusing = interactable;
 
         Debug.Log($"Focusing on <color=yellow>{interactable.Context.name}</color>");
@@ -36,9 +56,9 @@ public class CharacterInteractController : MonoBehaviour
     {
         if (_focusing != null)
         {
-            if (_focusing is IHighlightable highlightable)
+            if (_focusing.Context.TryGetComponent<HighlightHelper>(out var highlight))
             {
-                highlightable.HideHighlight();
+                highlight.HideHighlight();
             }
 
             _focusing = null;
@@ -51,19 +71,21 @@ public class CharacterInteractController : MonoBehaviour
         {
             if (_focusing.IsInteractable)
             {
-                Debug.Log($"Interact with <color=green>{_focusing.Context.name}</color>");
-
-                // TODO: Need to make the system more flexible
-                if (_focusing is IPickable pickable)
+                // TODO: Test and check if this is really flexible
+                var interactionType = interactGroupConfig.GetInteractionType(_holding, _focusing);
+                if (interactionDelegateMap.TryGetValue(interactionType, out var action))
                 {
-                    PickUp(pickable);
+                    action?.Invoke(_focusing);
                 }
+
+                Debug.Log($"Interact with <color=green>{_focusing.Context.name}</color>");
             }
         }
     }
 
-    private void PickUp(IPickable pickable)
+    public void PickUp(IInteractable interactable)
     {
+        var pickable = interactable as IPickable;
         pickable.GetPicked();
 
         var go = pickable.Context;
@@ -72,6 +94,7 @@ public class CharacterInteractController : MonoBehaviour
         go.transform.localRotation = Quaternion.identity;
 
         _holding = pickable;
+        _forceCheckHighlight = true;
     }
 
     public void TryDrop()
@@ -80,6 +103,7 @@ public class CharacterInteractController : MonoBehaviour
         {
             if (_holding is IPickable pickable)
             {
+                pickable.ResetPicked();
                 pickable.GetDropped();
             }
 
@@ -87,6 +111,26 @@ public class CharacterInteractController : MonoBehaviour
             go.transform.SetParent(null);
 
             _holding = null;
+            _forceCheckHighlight = true;
         }
+    }
+
+    public void TryPlace(IInteractable interactable)
+    {
+        if (_holding != null)
+        {
+            var receivable = interactable as IObjectReceivable;
+            _holding.ResetPicked();
+            _holding.GetPlaced(receivable);
+            receivable.ReceiveObject(_holding, ResetPlacement);
+
+            _holding = null;
+            _forceCheckHighlight = true;
+        }
+    }
+
+    private void ResetPlacement(IPickable pickable)
+    {
+        pickable.ResetPlaced();
     }
 }

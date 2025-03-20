@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,12 +14,18 @@ public interface IPickable : IInteractable
 {
     void GetPicked();
 
+    void ResetPicked();
+
     void GetDropped();
+
+    void GetPlaced(IObjectReceivable receivable);
+
+    void ResetPlaced();
 }
 
-public interface IHighlightable
+public interface IObjectReceivable : IInteractable
 {
-    void ShowHighlight();
+    void ReceiveObject(IPickable pickable, Action<IPickable> onResetPlacement);
 
-    void HideHighlight();
+    void ReleaseObject(IPickable pickable);
 }

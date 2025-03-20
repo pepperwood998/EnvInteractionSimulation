@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class ColliderHelper : MonoBehaviour
@@ -20,5 +21,12 @@ public class ColliderHelper : MonoBehaviour
         {
             collider.enabled = false;
         }
+    }
+
+    [Button]
+    private void Import(GameObject target)
+    {
+        var colliders = target.GetComponents<Collider>();
+        this.colliders = colliders;
     }
 }
