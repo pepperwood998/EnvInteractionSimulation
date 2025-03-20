@@ -5165,7 +5165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea546ed0cd7ccb14288281e6ecd969a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactGroupConfig: {fileID: 11400000, guid: 52529c16f4861a44bba35ca458556a78, type: 2}
   interactionDelegateMap:
     keyData: 0100000002000000
     valueData:
@@ -5197,6 +5196,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  interactGroupConfig: {fileID: 11400000, guid: 52529c16f4861a44bba35ca458556a78, type: 2}
   hand: {fileID: 971544304}
 --- !u!1001 &1353957481
 PrefabInstance:
@@ -5505,7 +5505,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 119
 --- !u!114 &1448141703
 MonoBehaviour:
   m_ObjectHideFlags: 0
