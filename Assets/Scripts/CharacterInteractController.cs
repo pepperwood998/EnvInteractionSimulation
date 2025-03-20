@@ -36,7 +36,7 @@ public class CharacterInteractController : MonoBehaviour
             if (interactable.Context.TryGetComponent<HighlightHelper>(out var current))
             {
                 var interactionType = interactGroupConfig.GetInteractionType(_holding, interactable);
-                if (interactionType != InteractionType.None)
+                if (interactionType != InteractionType.None && CheckInteractionCustom(interactionType, interactable, _holding))
                 {
                     current.ShowHighlight();
                 }
@@ -132,5 +132,16 @@ public class CharacterInteractController : MonoBehaviour
     private void ResetPlacement(IPickable pickable)
     {
         pickable.ResetPlaced();
+    }
+
+    private bool CheckInteractionCustom(InteractionType type, IInteractable target, IInteractable attachment)
+    {
+        var customCheckController = target.Context.GetComponent<InteractCustomCheckController>();
+        if (customCheckController)
+        {
+            return customCheckController.Check(type, target, attachment);
+        }
+
+        return true;
     }
 }
