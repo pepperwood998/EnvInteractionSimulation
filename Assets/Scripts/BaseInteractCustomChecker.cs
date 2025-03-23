@@ -5,5 +5,5 @@ using UnityEngine;
 
 public abstract class BaseInteractCustomChecker : MonoBehaviour
 {
-    public abstract bool Check(IInteractable target, IInteractable attachment);
+    public abstract bool Check(IInteractable attachment);
 }

@@ -4,12 +4,21 @@ using UnityEngine;
 
 public class SimplePlaceInteractChecker : BaseInteractCustomChecker
 {
-    public override bool Check(IInteractable target, IInteractable attachment)
+    [SerializeField] private List<SimplePlacableName> placables;
+    public override bool Check(IInteractable attachment)
     {
-        return true;
+        if (attachment.Context.TryGetComponent<SimplePlacableHelper>(out var placable))
+        {
+            return placables.Contains(placable.PlacableName);
+        }
+
+        return false;
     }
 }
 
 public enum SimplePlacableName
 {
+    Fruit = 0,
+    Food,
+    Container,
 }

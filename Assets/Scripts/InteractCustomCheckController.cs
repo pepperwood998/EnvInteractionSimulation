@@ -7,13 +7,13 @@ public class InteractCustomCheckController : MonoBehaviour
 {
     [SerializeField] private SerializedDictionary<InteractionType, BaseInteractCustomChecker> checkerMap;
 
-    public bool Check(InteractionType type, IInteractable target, IInteractable attachment)
+    public bool Check(InteractionType type, IInteractable attachment)
     {
         if (checkerMap.TryGetValue(type, out var checker))
         {
-            return checker.Check(target, attachment);
+            return checker.Check(attachment);
         }
 
-        return false;
+        return true;
     }
 }

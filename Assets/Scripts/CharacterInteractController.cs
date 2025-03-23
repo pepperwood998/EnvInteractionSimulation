@@ -75,7 +75,10 @@ public class CharacterInteractController : MonoBehaviour
                 var interactionType = interactGroupConfig.GetInteractionType(_holding, _focusing);
                 if (interactionDelegateMap.TryGetValue(interactionType, out var action))
                 {
-                    action?.Invoke(_focusing);
+                    if (CheckInteractionCustom(interactionType, _focusing, _holding))
+                    {
+                        action?.Invoke(_focusing);
+                    }
                 }
 
                 Debug.Log($"Interact with <color=green>{_focusing.Context.name}</color>");
@@ -115,11 +118,11 @@ public class CharacterInteractController : MonoBehaviour
         }
     }
 
-    public void TryPlace(IInteractable interactable)
+    public void TryPlace(IInteractable target)
     {
         if (_holding != null)
         {
-            var receivable = interactable as IObjectReceivable;
+            var receivable = target as IObjectReceivable;
             _holding.ResetPicked();
             _holding.GetPlaced(receivable);
             receivable.ReceiveObject(_holding, ResetPlacement);
@@ -139,7 +142,7 @@ public class CharacterInteractController : MonoBehaviour
         var customCheckController = target.Context.GetComponent<InteractCustomCheckController>();
         if (customCheckController)
         {
-            return customCheckController.Check(type, target, attachment);
+            return customCheckController.Check(type, attachment);
         }
 
         return true;

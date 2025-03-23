@@ -8,11 +8,7 @@ public class SimpleObject : MonoBehaviour, IPickable
 
     public bool IsInteractable => _isInteractable;
 
-    // [SerializeField] private Rigidbody rb;
-    // [SerializeField] private ColliderHelper colliders;
     [SerializeField] private PickableHelper pickableHelper;
-
-    // private IObjectReceivable _activeReceiver;
 
     [Header("Debug")]
     [SerializeField] private bool _isInteractable;
@@ -21,13 +17,6 @@ public class SimpleObject : MonoBehaviour, IPickable
 
     public void GetPicked()
     {
-        // if (_activeReceiver != null)
-        // {
-        //     _activeReceiver.ReleaseObject(this);
-        // }
-
-        // rb.useGravity = false;
-        // colliders.TurnOff();
         pickableHelper.MarkPicked(this);
 
         _isInteractable = false;
@@ -35,8 +24,6 @@ public class SimpleObject : MonoBehaviour, IPickable
 
     public void ResetPicked()
     {
-        // rb.useGravity = true;
-        // colliders.TurnOn();
         pickableHelper.ResetPicked();
 
         _isInteractable = true;
@@ -46,19 +33,11 @@ public class SimpleObject : MonoBehaviour, IPickable
 
     public void GetPlaced(IObjectReceivable receivable)
     {
-        // rb.useGravity = false;
-        // rb.isKinematic = true;
-
-        // _activeReceiver = receivable;
         pickableHelper.MarkPlaced(receivable);
     }
 
     public void ResetPlaced()
     {
-        // rb.useGravity = true;
-        // rb.isKinematic = false;
-
-        // _activeReceiver = null;
         pickableHelper.ResetPlaced();
     }
 
