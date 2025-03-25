@@ -6,7 +6,8 @@ using UnityEngine.Events;
 
 public abstract class BasicCharacterInteractController : MonoBehaviour
 {
-    [SerializeField] private Transform hand;
+    [Header("Base")]
+    [SerializeField] protected Transform hand;
 
     private IInteractable _focusing;
     private IPickable _holding;
@@ -31,7 +32,7 @@ public abstract class BasicCharacterInteractController : MonoBehaviour
 
             if (interactable.Context.TryGetComponent<HighlightHelper>(out var current))
             {
-                if (CheckInteractCustomConditions(interactable, _holding, out _))
+                if (CheckInteractable(interactable, _holding, out _))
                 {
                     current.ShowHighlight();
                 }
@@ -63,7 +64,7 @@ public abstract class BasicCharacterInteractController : MonoBehaviour
             if (_focusing.IsInteractable)
             {
                 // TODO: Test and check if this is really flexible
-                if (CheckInteractCustomConditions(_focusing, _holding, out var action))
+                if (CheckInteractable(_focusing, _holding, out var action))
                 {
                     action?.Invoke(_focusing);
                 }
@@ -73,6 +74,57 @@ public abstract class BasicCharacterInteractController : MonoBehaviour
         }
     }
 
-    protected abstract bool CheckInteractCustomConditions
+    public void PickUp(IInteractable interactable)
+    {
+        var pickable = interactable as IPickable;
+        pickable.GetPicked();
+
+        var go = pickable.Context;
+        go.transform.SetParent(hand);
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localRotation = Quaternion.identity;
+
+        _holding = pickable;
+        _forceCheckHighlight = true;
+    }
+
+    public void TryDrop()
+    {
+        if (_holding != null)
+        {
+            if (_holding is IPickable pickable)
+            {
+                pickable.ResetPicked();
+                pickable.GetDropped();
+            }
+
+            var go = _holding.Context;
+            go.transform.SetParent(null);
+
+            _holding = null;
+            _forceCheckHighlight = true;
+        }
+    }
+
+    public void TryPlace(IInteractable target)
+    {
+        if (_holding != null)
+        {
+            var receivable = target as IObjectReceivable;
+            _holding.ResetPicked();
+            _holding.GetPlaced(receivable);
+            receivable.ReceiveObject(_holding, ResetPlacement);
+
+            _holding = null;
+            _forceCheckHighlight = true;
+        }
+    }
+
+    protected void ResetPlacement(IPickable pickable)
+    {
+        pickable.ResetPlaced();
+    }
+
+    protected abstract bool CheckInteractable
         (IInteractable interactable, IPickable attachment, out UnityEvent<IInteractable> actionDelegate);
 }
