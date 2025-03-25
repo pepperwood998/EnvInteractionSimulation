@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickableHelper : MonoBehaviour
+public class SimplePickableHelper : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;
     [SerializeField] private ColliderHelper colliders;
