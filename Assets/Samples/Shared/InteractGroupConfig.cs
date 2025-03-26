@@ -38,6 +38,31 @@ namespace EnvInteraction.Samples.Shared
             return InteractionType.None;
         }
 
+        public bool TryIterateInteractionTypes(IInteractable target, IInteractable attachment, Func<InteractionType, IInteractable, IInteractable, bool> customCheckDelegate, out InteractionType interactionType)
+        {
+            var targetType = GetInteractableTypes(target);
+            var attachmentType = GetInteractableTypes(attachment);
+            for (int i = 0; i < interactionPriority.Count; i++)
+            {
+                var config = interactionPriority[i];
+                if ((targetType & config.target) != 0)
+                {
+                    if ((attachmentType == InteractableType.None && config.attachment == InteractableType.None)
+                        || (attachmentType & config.attachment) != 0)
+                    {
+                        if (customCheckDelegate(config.interaction, target, attachment))
+                        {
+                            interactionType = config.interaction;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            interactionType = InteractionType.None;
+            return false;
+        }
+
         private InteractableType GetInteractableTypes(IInteractable interactable)
         {
             InteractableType type = InteractableType.None;

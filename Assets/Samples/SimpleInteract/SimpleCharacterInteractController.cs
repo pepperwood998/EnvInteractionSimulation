@@ -15,11 +15,23 @@ public class SimpleCharacterInteractController : BasicCharacterInteractControlle
     protected override bool CheckInteractable(
         IInteractable interactable, IPickable attachment, out UnityEvent<IInteractable> actionDelegate)
     {
-        var interactionType = interactGroupConfig.GetInteractionType(attachment, interactable);
-        if (interactionDelegateMap.TryGetValue(interactionType, out var action))
+        // var interactionType = interactGroupConfig.GetInteractionType(attachment, interactable);
+        // if (interactionDelegateMap.TryGetValue(interactionType, out var action))
+        // {
+        //     if (CheckInteractCustom(interactionType, interactable, attachment))
+        //     {
+        //         actionDelegate = action;
+        //         return true;
+        //     }
+        // }
+
+        if (interactGroupConfig.TryIterateInteractionTypes(interactable, attachment, CheckInteractCustom, out var interactionType))
         {
-            actionDelegate = action;
-            return CheckInteractCustom(interactionType, interactable, attachment);
+            if (interactionDelegateMap.TryGetValue(interactionType, out var action))
+            {
+                actionDelegate = action;
+                return true;
+            }
         }
 
         actionDelegate = null;
